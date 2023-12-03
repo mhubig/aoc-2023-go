@@ -14,6 +14,11 @@ import (
 var data string
 
 func main() {
+	result := computeCalibrationValueSum(data)
+	fmt.Println(result)
+}
+
+func computeCalibrationValueSum(data string) int {
 	lines := strings.Split(data, "\n")
 
 	var numbers []int
@@ -26,7 +31,7 @@ func main() {
 		result += numbers[i]
 	}
 
-	fmt.Println(result)
+	return result
 }
 
 func findCalibrationValue(text string) int {
