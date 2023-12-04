@@ -4,102 +4,95 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
 	_ "embed"
 )
 
-//go:embed data.txt
-var data string
-
-func main() {
-	regexPattern1 := "[1-9]"
-	regexPattern2 := "[0-9]|one|two|three|four|five|six|seven|eight|nine"
-
-	result1 := computeCalibrationValueSum(data, regexPattern1)
-	fmt.Println("Part 1:", result1)
-
-	result2 := computeCalibrationValueSum(data, regexPattern2)
-	fmt.Println("Part 2:", result2)
+type Match struct {
+	Number int
+	Index  int
 }
 
-func computeCalibrationValueSum(data string, pattern string) int {
-	regex := regexp.MustCompile(pattern)
-	lines := strings.Split(data, "\n")
+type MatchList []Match
 
-	var numbers []int
-	for i := 0; i < len(lines); i++ {
-		numbers = append(numbers, findCalibrationValue(lines[i], regex))
+func (m MatchList) Len() int {
+	return len(m)
+}
+
+func (m MatchList) Less(i, j int) bool {
+	return m[i].Index < m[j].Index
+}
+
+func (m MatchList) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+func findAllMatchesOfNumber(number int, pattern string, text string) (matches MatchList) {
+	regex := regexp.MustCompile(pattern)
+	index := regex.FindAllIndex([]byte(text), -1)
+
+	for i := range index {
+		matches = append(matches, Match{Number: number, Index: index[i][0]})
 	}
 
-	var result int
-	for i := 0; i < len(numbers); i++ {
-		result += numbers[i]
+	return matches
+}
+
+func getSortedNumbers(line string) (matches MatchList) {
+	matches = append(matches, findAllMatchesOfNumber(1, "1", line)...)
+	matches = append(matches, findAllMatchesOfNumber(2, "2", line)...)
+	matches = append(matches, findAllMatchesOfNumber(3, "3", line)...)
+	matches = append(matches, findAllMatchesOfNumber(4, "4", line)...)
+	matches = append(matches, findAllMatchesOfNumber(5, "5", line)...)
+	matches = append(matches, findAllMatchesOfNumber(6, "6", line)...)
+	matches = append(matches, findAllMatchesOfNumber(7, "7", line)...)
+	matches = append(matches, findAllMatchesOfNumber(8, "8", line)...)
+	matches = append(matches, findAllMatchesOfNumber(9, "9", line)...)
+
+	matches = append(matches, findAllMatchesOfNumber(1, "one", line)...)
+	matches = append(matches, findAllMatchesOfNumber(2, "two", line)...)
+	matches = append(matches, findAllMatchesOfNumber(3, "three", line)...)
+	matches = append(matches, findAllMatchesOfNumber(4, "four", line)...)
+	matches = append(matches, findAllMatchesOfNumber(5, "five", line)...)
+	matches = append(matches, findAllMatchesOfNumber(6, "six", line)...)
+	matches = append(matches, findAllMatchesOfNumber(7, "seven", line)...)
+	matches = append(matches, findAllMatchesOfNumber(8, "eight", line)...)
+	matches = append(matches, findAllMatchesOfNumber(9, "nine", line)...)
+
+	sort.Sort(matches)
+	return matches
+}
+
+func computeCalibrationValue(line string) int {
+	matches := getSortedNumbers(line)
+
+	fist := matches[0]
+	last := matches[len(matches)-1]
+
+	result, err := strconv.Atoi(fmt.Sprintf("%d%d", fist.Number, last.Number))
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return result
 }
 
-func findCalibrationValue(line string, regex *regexp.Regexp) int {
-	var digits []string
-	for i := 0; i < len(line); i++ {
-		found := regex.FindString(line[i:])
-		if found == "" {
-			continue
-		}
-		digits = append(digits, found)
+func computeCalibrationValueSum(data string) (result int) {
+	lines := strings.Split(data, "\n")
+
+	for i := range lines {
+		result += computeCalibrationValue(lines[i])
 	}
 
-	sanitizedDigits := sanitizeDigits(digits)
-
-	first := sanitizedDigits[0]
-	last := sanitizedDigits[len(sanitizedDigits)-1]
-
-	calibrationValue, err := strconv.Atoi(fmt.Sprintf("%s%s", first, last))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//fmt.Println(line, digits, sanitizedDigits, calibrationValue)
-	return calibrationValue
+	return result
 }
 
-func sanitizeDigits(digits []string) []string {
-	var sanitizedDigits []string
+//go:embed data.txt
+var data string
 
-	for i := 0; i < len(digits); i++ {
-		if len(digits[i]) > 1 {
-			sanitizedDigits = append(sanitizedDigits, convertToNumber(digits[i]))
-		} else {
-			sanitizedDigits = append(sanitizedDigits, digits[i])
-		}
-	}
-
-	return sanitizedDigits
-}
-
-func convertToNumber(number string) string {
-	switch number {
-	case "one":
-		return "1"
-	case "two":
-		return "2"
-	case "three":
-		return "3"
-	case "four":
-		return "4"
-	case "five":
-		return "5"
-	case "six":
-		return "6"
-	case "seven":
-		return "7"
-	case "eight":
-		return "8"
-	case "nine":
-		return "9"
-	default:
-		return "0"
-	}
+func main() {
+	fmt.Println(computeCalibrationValueSum(data))
 }
