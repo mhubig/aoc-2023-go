@@ -95,11 +95,9 @@ func gameIsPossible(game *Game, refSet *GameSet) bool {
 		if game.Sets[i].Red > refSet.Red {
 			return false
 		}
-
 		if game.Sets[i].Green > refSet.Green {
 			return false
 		}
-
 		if game.Sets[i].Blue > refSet.Blue {
 			return false
 		}
@@ -142,8 +140,9 @@ func main() {
 		Blue:  14,
 	}
 
-	var minRefSets []*GameSet
 	games := readListOfGames(data)
+
+	var minRefSets []*GameSet
 	var possibleGames []int
 	for i := range games {
 		if gameIsPossible(games[i], refGameSet) {
