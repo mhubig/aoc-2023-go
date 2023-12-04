@@ -108,6 +108,30 @@ func gameIsPossible(game *Game, refSet *GameSet) bool {
 	return true
 }
 
+func getMinRefSet(game *Game) *GameSet {
+	var maxRed, maxGreen, maxBlue int = 0, 0, 0
+
+	for i := range game.Sets {
+		if game.Sets[i].Red > maxRed {
+			maxRed = game.Sets[i].Red
+		}
+
+		if game.Sets[i].Green > maxGreen {
+			maxGreen = game.Sets[i].Green
+		}
+
+		if game.Sets[i].Blue > maxBlue {
+			maxBlue = game.Sets[i].Blue
+		}
+	}
+
+	return &GameSet{
+		Red:   maxRed,
+		Green: maxGreen,
+		Blue:  maxBlue,
+	}
+}
+
 //go:embed data.txt
 var data string
 
@@ -118,13 +142,16 @@ func main() {
 		Blue:  14,
 	}
 
+	var minRefSets []*GameSet
 	games := readListOfGames(data)
 	var possibleGames []int
 	for i := range games {
 		if gameIsPossible(games[i], refGameSet) {
-			fmt.Println(games[i].Id)
+			//fmt.Println(games[i].Id)
 			possibleGames = append(possibleGames, games[i].Id)
 		}
+
+		minRefSets = append(minRefSets, getMinRefSet(games[i]))
 	}
 
 	var result int
@@ -132,5 +159,18 @@ func main() {
 		result += possibleGames[i]
 	}
 
-	fmt.Println("Sum of possible game ID's:", result)
+	fmt.Println("Part 1: Sum of possible game ID's:", result)
+
+	var listOfRefSetPower []int
+	for i := range minRefSets {
+		//fmt.Println(minRefSets[i])
+		listOfRefSetPower = append(listOfRefSetPower, minRefSets[i].Red*minRefSets[i].Green*minRefSets[i].Blue)
+	}
+
+	var result2 int
+	for i := range listOfRefSetPower {
+		result2 += listOfRefSetPower[i]
+	}
+
+	fmt.Println("Part 2: Sum of reference set power:", result2)
 }
