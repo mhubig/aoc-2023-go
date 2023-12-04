@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	_ "embed"
@@ -69,15 +67,10 @@ func getSortedNumbers(line string) (matches MatchList) {
 func computeCalibrationValue(line string) int {
 	matches := getSortedNumbers(line)
 
-	fist := matches[0]
-	last := matches[len(matches)-1]
+	first := matches[0].Number * 10
+	last := matches[len(matches)-1].Number
 
-	result, err := strconv.Atoi(fmt.Sprintf("%d%d", fist.Number, last.Number))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return result
+	return first + last
 }
 
 func computeCalibrationValueSum(data string) (result int) {
