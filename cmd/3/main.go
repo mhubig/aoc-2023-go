@@ -110,16 +110,6 @@ func filterNumbers(numbers NumberList, symbol Symbol) (filtered NumberList) {
 var data string
 
 func main() {
-
-	//  y
-	//  | bbbbb
-	//  | bbb*b
-	//  | bbbbb
-	// -|------- x
-	//
-	// a.x - 3 <=> a.x + 1
-	// a.y - 1 <=> a.y + 1
-
 	symbols := getCoordinatesOfSymbols(data)
 	numbers := getCoordinatesOfNumbers(data)
 
