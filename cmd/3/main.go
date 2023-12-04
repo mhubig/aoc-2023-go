@@ -106,6 +106,16 @@ func filterNumbers(numbers NumberList, symbol Symbol) (filtered NumberList) {
 	return filtered
 }
 
+func filterSymbols(symbols SymbolList, symbol string) (filtered SymbolList) {
+	for s := range symbols {
+		if symbols[s].Symbol == symbol {
+			filtered = append(filtered, symbols[s])
+		}
+	}
+
+	return filtered
+}
+
 //go:embed data.txt
 var data string
 
@@ -118,12 +128,22 @@ func main() {
 		partNumbers = append(partNumbers, filterNumbers(numbers, symbols[s])...)
 	}
 
-	fmt.Println(partNumbers)
-
 	var sumOfPartNumbers int
 	for n := range partNumbers {
 		sumOfPartNumbers += partNumbers[n].Number
 	}
 
-	fmt.Println(sumOfPartNumbers)
+	fmt.Println("Sum of Part Numbers:", sumOfPartNumbers)
+
+	var gearNumberSum int
+	starSymbols := filterSymbols(symbols, "*")
+	for s := range starSymbols {
+		adjacentNumbers := filterNumbers(numbers, starSymbols[s])
+
+		if len(adjacentNumbers) == 2 {
+			gearNumberSum += adjacentNumbers[0].Number * adjacentNumbers[1].Number
+		}
+	}
+
+	fmt.Println("Sum of Gear Numbers:", gearNumberSum)
 }

@@ -305,3 +305,25 @@ func TestFilterNumbers_GivenOneSymbolAndOneNotAdjacentNumber_ReturnNothing(t *te
 		t.Errorf("Expected %d, got %d", 0, len(filtered))
 	}
 }
+
+func TestFilterSymbolss_GivenTwoDifferentSymbols_ReturnTheStarSymbol(t *testing.T) {
+	givenSymbol := "*"
+	givenSymbols := SymbolList{
+		{"*", Coordinate{0, 0}},
+		{"$", Coordinate{0, 0}},
+	}
+
+	expected := SymbolList{
+		{"*", Coordinate{0, 0}},
+	}
+
+	filtered := filterSymbols(givenSymbols, givenSymbol)
+
+	if len(filtered) != len(expected) {
+		t.Errorf("Expected %d, got %d", len(expected), len(filtered))
+	}
+
+	if filtered[0] != expected[0] {
+		t.Errorf("Expected %v, got %v", expected[0], filtered[0])
+	}
+}
