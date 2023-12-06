@@ -7,7 +7,7 @@ import (
 func TestUnmarshalText_HasCorrectCardNumber(t *testing.T) {
 	given := "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
 	expected := &ScratchCard{
-		CardNumber:     "1",
+		CardNumber:     1,
 		GivenNumbers:   []int{41, 48, 83, 86, 17},
 		WinningNumbers: []int{83, 86, 6, 31, 17, 9, 48, 53},
 	}
@@ -19,14 +19,14 @@ func TestUnmarshalText_HasCorrectCardNumber(t *testing.T) {
 	}
 
 	if card.CardNumber != expected.CardNumber {
-		t.Errorf("Expected %s, got %s", expected.CardNumber, card.CardNumber)
+		t.Errorf("Expected %d, got %d", expected.CardNumber, card.CardNumber)
 	}
 }
 
 func TestUnmarshalText_HasCorrectWinningNumbers(t *testing.T) {
 	given := "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
 	expected := &ScratchCard{
-		CardNumber:     "1",
+		CardNumber:     1,
 		WinningNumbers: []int{41, 48, 83, 86, 17},
 		GivenNumbers:   []int{83, 86, 6, 31, 17, 9, 48, 53},
 	}
@@ -45,7 +45,7 @@ func TestUnmarshalText_HasCorrectWinningNumbers(t *testing.T) {
 func TestUnmarshalText_HasCorrectGivenNumbers(t *testing.T) {
 	given := "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
 	expected := &ScratchCard{
-		CardNumber:     "1",
+		CardNumber:     1,
 		WinningNumbers: []int{41, 48, 83, 86, 17},
 		GivenNumbers:   []int{83, 86, 6, 31, 17, 9, 48, 53},
 	}
@@ -61,118 +61,158 @@ func TestUnmarshalText_HasCorrectGivenNumbers(t *testing.T) {
 	}
 }
 
-func TestGetLuckyNumbers_EmptyScratchcard_HasNoLuckyNumbers(t *testing.T) {
+func TestSetWins_EmptyScratchcard_HasNoWins(t *testing.T) {
 	given := &ScratchCard{}
 
-	if len(given.GetLuckyNumbers()) != 0 {
-		t.Errorf("Expected %d, got %d", 0, len(given.GetLuckyNumbers()))
+	setWins(given)
+
+	if given.Wins != 0 {
+		t.Errorf("Expected %d, got %d", 0, given.Wins)
 	}
 }
 
-func TestGetLuckyNumbers_ScratchcardWithNoLuckyNumbers_HasNoLuckyNumbers(t *testing.T) {
+func TestSetWins_ScratchcardWithNoIntersectingNumbers_HasNoWins(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 5, 6},
 	}
 
-	if len(given.GetLuckyNumbers()) != 0 {
-		t.Errorf("Expected %d, got %d", 0, len(given.GetLuckyNumbers()))
+	setWins(given)
+
+	if given.Wins != 0 {
+		t.Errorf("Expected %d, got %d", 0, given.Wins)
 	}
 }
 
-func TestGetLuckyNumbers_ScratchcardWithOneLuckyNumber_HasOneLuckyNumber(t *testing.T) {
+func TestSetWins_ScratchcardWithOneIntersectingNumber_HasOneWin(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 5, 3},
 	}
 
-	if len(given.GetLuckyNumbers()) != 1 {
-		t.Errorf("Expected %d, got %d", 1, len(given.GetLuckyNumbers()))
-	}
+	setWins(given)
 
-	if given.GetLuckyNumbers()[0] != 3 {
-		t.Errorf("Expected %d, got %d", 3, given.GetLuckyNumbers()[0])
+	if given.Wins != 1 {
+		t.Errorf("Expected %d, got %d", 1, given.Wins)
 	}
 }
 
-func TestGetLuckyNumbers_ScratchcardWithTwoLuckyNumbers_HasTwoLuckyNumbers(t *testing.T) {
+func TestSetWins_ScratchcardWithTwoIntersectingNumbers_HasTwoWins(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 3, 2},
 	}
 
-	if len(given.GetLuckyNumbers()) != 2 {
-		t.Errorf("Expected %d, got %d", 2, len(given.GetLuckyNumbers()))
-	}
+	setWins(given)
 
-	if given.GetLuckyNumbers()[0] != 2 {
-		t.Errorf("Expected %d, got %d", 2, given.GetLuckyNumbers()[0])
-	}
-
-	if given.GetLuckyNumbers()[1] != 3 {
-		t.Errorf("Expected %d, got %d", 3, given.GetLuckyNumbers()[1])
+	if given.Wins != 2 {
+		t.Errorf("Expected %d, got %d", 2, given.Wins)
 	}
 }
 
 func TestGetPoints_EmptyScratchcard_HasNoPoints(t *testing.T) {
 	given := &ScratchCard{}
 
-	if given.GetPoints() != 0 {
-		t.Errorf("Expected %d, got %d", 0, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 0 {
+		t.Errorf("Expected %d, got %d", 0, given.Points)
 	}
 }
 
-func TestGetPoints_ScratchcardWithNoLuckyNumbers_HasNoPoints(t *testing.T) {
+func TestGetPoints_ScratchcardWithIntersectingNumbers_HasNoPoints(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 5, 6},
 	}
 
-	if given.GetPoints() != 0 {
-		t.Errorf("Expected %d, got %d", 0, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 0 {
+		t.Errorf("Expected %d, got %d", 0, given.Points)
 	}
 }
 
-func TestGetPoints_ScratchcardWithOneLuckyNumber_HasOnePoint(t *testing.T) {
+func TestGetPoints_ScratchcardWithOneIntersectingNumber_HasOnePoint(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 5, 3},
 	}
 
-	if given.GetPoints() != 1 {
-		t.Errorf("Expected %d, got %d", 1, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 1 {
+		t.Errorf("Expected %d, got %d", 1, given.Points)
 	}
 }
 
-func TestGetPoints_ScratchcardWithTwoLuckyNumbers_HasTwoPoints(t *testing.T) {
+func TestGetPoints_ScratchcardWithTwoIntersectingNumbers_HasTwoPoints(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{4, 3, 2},
 	}
 
-	if given.GetPoints() != 2 {
-		t.Errorf("Expected %d, got %d", 2, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 2 {
+		t.Errorf("Expected %d, got %d", 2, given.Points)
 	}
 }
 
-func TestGetPoints_ScratchcardWithThreeLuckyNumbers_HasFourPoints(t *testing.T) {
+func TestGetPoints_ScratchcardWithThreeIntersectingNumbers_HasFourPoints(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3},
 		GivenNumbers:   []int{1, 3, 2},
 	}
 
-	if given.GetPoints() != 4 {
-		t.Errorf("Expected %d, got %d", 4, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 4 {
+		t.Errorf("Expected %d, got %d", 4, given.Points)
 	}
 }
 
-func TestGetPoints_ScratchcardWithFourLuckyNumbers_HasEightPoints(t *testing.T) {
+func TestGetPoints_ScratchcardWithFourIntersectingNumbers_HasEightPoints(t *testing.T) {
 	given := &ScratchCard{
 		WinningNumbers: []int{1, 2, 3, 4},
 		GivenNumbers:   []int{1, 3, 2, 4},
 	}
 
-	if given.GetPoints() != 8 {
-		t.Errorf("Expected %d, got %d", 8, given.GetPoints())
+	setWins(given)
+	setPoints(given)
+
+	if given.Points != 8 {
+		t.Errorf("Expected %d, got %d", 8, given.Points)
+	}
+}
+
+func TestWinScatchCards_GivenTwoCardsWithOneWin_ResultIsThree(t *testing.T) {
+	given := []ScratchCard{
+		{
+			CardNumber:     1,
+			WinningNumbers: []int{1, 2, 3},
+			GivenNumbers:   []int{4, 5, 3},
+			Wins:           1,
+			Points:         1,
+		},
+		{
+			CardNumber:     2,
+			WinningNumbers: []int{1, 2, 3},
+			GivenNumbers:   []int{4, 5, 6},
+			Wins:           0,
+			Points:         0,
+		},
+	}
+	expected := 3
+
+	result := winScatchCards(given)
+
+	if result != expected {
+		t.Errorf("Expected %d, got %d", expected, result)
 	}
 }

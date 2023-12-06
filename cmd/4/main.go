@@ -10,14 +10,26 @@ import (
 )
 
 type ScratchCard struct {
-	CardNumber     string
+	CardNumber     int
 	WinningNumbers []int
 	GivenNumbers   []int
+	Wins           int
+	Points         int
+	Copies         int
+}
+
+func (sc *ScratchCard) String() string {
+	return fmt.Sprintf("Card %d (%d): %v | %v", sc.CardNumber, sc.Copies, sc.WinningNumbers, sc.GivenNumbers)
 }
 
 func (sc *ScratchCard) UnmarshalText(text []byte) error {
 	parts := strings.Split(string(text), ":")
-	sc.CardNumber = strings.Fields(parts[0])[1]
+
+	var err error
+	sc.CardNumber, err = strconv.Atoi(strings.Fields(parts[0])[1])
+	if err != nil {
+		return err
+	}
 
 	anumbers := strings.Split(parts[1], "|")
 	wnumbers := strings.Fields(anumbers[0])
@@ -44,7 +56,7 @@ func (sc *ScratchCard) UnmarshalText(text []byte) error {
 	return nil
 }
 
-func (sc *ScratchCard) GetLuckyNumbers() []int {
+func setWins(sc *ScratchCard) {
 	var luckyNumbers []int
 
 	for i := range sc.WinningNumbers {
@@ -53,42 +65,69 @@ func (sc *ScratchCard) GetLuckyNumbers() []int {
 		}
 	}
 
-	return luckyNumbers
+	sc.Wins = len(luckyNumbers)
 }
 
-func (sc *ScratchCard) GetPoints() (points int) {
-	luckyNumbers := sc.GetLuckyNumbers()
-	numberOfLuckyNumbers := len(luckyNumbers)
+func setPoints(sc *ScratchCard) {
+	if sc.Wins == 0 {
+		sc.Points = 0
+	} else {
+		sc.Points = int(math.Pow(2, float64(sc.Wins-1)))
+	}
+}
 
-	if numberOfLuckyNumbers == 0 {
-		return 0
+func winScatchCards(cards []ScratchCard) (result int) {
+	for i := range cards {
+		cards[i].Copies += 1
+
+		for j := 1; j <= cards[i].Wins; j++ {
+			cards[i+j].Copies += cards[i].Copies
+		}
 	}
 
-	return int(math.Pow(2, float64(numberOfLuckyNumbers-1)))
+	for i := range cards {
+		result += cards[i].Copies
+	}
+
+	return result
+}
+
+func readScratchCards(data string) (cards []ScratchCard) {
+	lines := strings.Split(data, "\n")
+
+	for i := range lines {
+		card := ScratchCard{}
+		err := card.UnmarshalText([]byte(lines[i]))
+		if err != nil {
+			fmt.Println(err)
+			return cards
+		}
+
+		setWins(&card)
+		setPoints(&card)
+
+		cards = append(cards, card)
+	}
+
+	return cards
+}
+
+func calculatePoints(cards []ScratchCard) (points int) {
+	for i := range cards {
+		points += cards[i].Points
+	}
+
+	return points
 }
 
 //go:embed data.txt
 var data string
 
 func main() {
-	lines := strings.Split(data, "\n")
-
-	var cards []*ScratchCard
-	for i := range lines {
-		card := &ScratchCard{}
-		err := card.UnmarshalText([]byte(lines[i]))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		cards = append(cards, card)
-	}
-
-	var points int
-	for i := range cards {
-		points += cards[i].GetPoints()
-	}
+	cards := readScratchCards(data)
+	points := calculatePoints(cards)
+	result := winScatchCards(cards)
 
 	fmt.Println("Total Points:", points)
+	fmt.Println("Total Cards: ", result)
 }
