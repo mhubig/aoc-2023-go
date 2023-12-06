@@ -174,22 +174,26 @@ func TestParseMappingRules_GivenTwoMappingRules_ReturnsMapperWithMappingsFromBot
 }
 
 func TestGetSeeds_GivenSeeds_ReturnsSeeds(t *testing.T) {
-	input := "seeds: 1 2 3"
+	input := "seeds: 1 2 3 4"
 	seeds := getSeeds(input)
 
-	if len(seeds) != 3 {
-		t.Errorf("Expected 3, got %d", len(seeds))
+	if len(seeds) != 2 {
+		t.Errorf("Expected 2, got %d", len(seeds))
 	}
 
-	if seeds[0] != 1 {
-		t.Errorf("Expected 1, got %d", seeds[0])
+	if seeds[0][0] != 1 {
+		t.Errorf("Expected 1, got %d", seeds[0][0])
 	}
 
-	if seeds[1] != 2 {
-		t.Errorf("Expected 2, got %d", seeds[1])
+	if seeds[0][1] != 2 {
+		t.Errorf("Expected 2, got %d", seeds[0][1])
 	}
 
-	if seeds[2] != 3 {
-		t.Errorf("Expected 3, got %d", seeds[2])
+	if seeds[1][0] != 3 {
+		t.Errorf("Expected 3, got %d", seeds[1][0])
+	}
+
+	if seeds[1][1] != 6 {
+		t.Errorf("Expected 6, got %d", seeds[1][1])
 	}
 }

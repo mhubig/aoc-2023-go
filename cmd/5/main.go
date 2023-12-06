@@ -62,15 +62,23 @@ func parseMappingRules(input string) Mapper {
 	return createMapper(name, mappingRules)
 }
 
-func getSeeds(input string) (seeds []int) {
+func getSeeds(input string) (seeds [][]int) {
 	fields := strings.Fields(strings.Split(input, ":")[1])
+
+	var seedRanges []int
 	for _, field := range fields {
 		seed, err := strconv.Atoi(field)
 		if err != nil {
 			panic(err)
 		}
-		seeds = append(seeds, seed)
+		seedRanges = append(seedRanges, seed)
 	}
+
+	for i := 0; i < len(seedRanges); i = i + 2 {
+		start, end := seedRanges[i], seedRanges[i]+seedRanges[i+1]-1
+		seeds = append(seeds, []int{start, end})
+	}
+
 	return seeds
 }
 
@@ -84,7 +92,7 @@ func main() {
 	}()
 
 	mappingRules := strings.Split(data, "\n\n")
-	seeds := getSeeds(mappingRules[0])
+	seedRanges := getSeeds(mappingRules[0])
 
 	var listOfMappers []Mapper
 	for i := 1; i < len(mappingRules); i++ {
@@ -93,13 +101,16 @@ func main() {
 	}
 
 	locationNumbers := []int{}
-	for _, seed := range seeds {
-		for _, mapper := range listOfMappers {
-			seed = mapper.MapNumber(seed)
+	for i := 0; i < len(seedRanges); i++ {
+		for seed := seedRanges[i][0]; seed <= seedRanges[i][1]; seed++ {
+			mappedSeed := seed
+			for _, mapper := range listOfMappers {
+				mappedSeed = mapper.MapNumber(mappedSeed)
+			}
+			locationNumbers = append(locationNumbers, mappedSeed)
 		}
-		locationNumbers = append(locationNumbers, seed)
 	}
 
 	slices.Sort(locationNumbers)
-	fmt.Println("lowest location number:", locationNumbers[0])
+	fmt.Println("Lowest location number:", locationNumbers[0])
 }
