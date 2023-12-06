@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -100,17 +99,18 @@ func main() {
 		listOfMappers = append(listOfMappers, mapper)
 	}
 
-	locationNumbers := []int{}
+	var locationNumber int
 	for i := 0; i < len(seedRanges); i++ {
 		for seed := seedRanges[i][0]; seed <= seedRanges[i][1]; seed++ {
 			mappedSeed := seed
 			for _, mapper := range listOfMappers {
 				mappedSeed = mapper.MapNumber(mappedSeed)
 			}
-			locationNumbers = append(locationNumbers, mappedSeed)
+			if mappedSeed < locationNumber || locationNumber == 0 {
+				locationNumber = mappedSeed
+			}
 		}
 	}
 
-	slices.Sort(locationNumbers)
-	fmt.Println("Lowest location number:", locationNumbers[0])
+	fmt.Println("Lowest location number:", locationNumber)
 }
