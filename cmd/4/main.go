@@ -18,10 +18,6 @@ type ScratchCard struct {
 	Copies         int
 }
 
-func (sc *ScratchCard) String() string {
-	return fmt.Sprintf("Card %d (%d): %v | %v", sc.CardNumber, sc.Copies, sc.WinningNumbers, sc.GivenNumbers)
-}
-
 func (sc *ScratchCard) UnmarshalText(text []byte) error {
 	parts := strings.Split(string(text), ":")
 
