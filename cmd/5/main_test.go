@@ -49,7 +49,7 @@ func TestMapper_GivenOneMappingRule_ReturnsMapperWithOneSrcAndOneDestRange(t *te
 	}
 }
 
-func TestMapper_GivenNumberFromMappingRange_ReturnsMapedNumber(t *testing.T) {
+func TestMapNumber_GivenNumberFromMappingRange_ReturnsMapedNumber(t *testing.T) {
 	mappingRules := [][]int{{1, 2, 3}}
 	mapper := createMapper("foo-to-bar map", mappingRules)
 
@@ -66,7 +66,7 @@ func TestMapper_GivenNumberFromMappingRange_ReturnsMapedNumber(t *testing.T) {
 	}
 }
 
-func TestMapper_GivenNumberFromOutsideOfMappingRange_ReturnsSameNumber(t *testing.T) {
+func TestMapNumber_GivenNumberFromOutsideOfMappingRange_ReturnsSameNumber(t *testing.T) {
 	mappingRules := [][]int{{1, 2, 3}}
 	mapper := createMapper("foo-to-bar map", mappingRules)
 
@@ -195,5 +195,41 @@ func TestGetSeeds_GivenSeeds_ReturnsSeeds(t *testing.T) {
 
 	if seeds[1][1] != 6 {
 		t.Errorf("Expected 6, got %d", seeds[1][1])
+	}
+}
+
+func TestMapRange_GivenRangeIsSubsetOfMap_ReturnsMappedRange(t *testing.T) {
+	mappingRules := [][]int{{2, 1, 4}}
+	mapper := createMapper("foo-to-bar map", mappingRules)
+	mapped := mapper.MapRange(1, 3)
+
+	if len(mapped) != 1 {
+		t.Errorf("Expected 1, got %d", len(mapped))
+	}
+
+	if mapped[0][0] != 2 {
+		t.Errorf("Expected 2, got %d", mapped[0][0])
+	}
+
+	if mapped[0][1] != 4 {
+		t.Errorf("Expected 4, got %d", mapped[0][1])
+	}
+}
+
+func TestMapRange_GivenRangeIsDisjunctToMap_ReturnsGivenRange(t *testing.T) {
+	mappingRules := [][]int{{2, 1, 4}}
+	mapper := createMapper("foo-to-bar map", mappingRules)
+	mapped := mapper.MapRange(5, 8)
+
+	if len(mapped) != 1 {
+		t.Errorf("Expected 1, got %d", len(mapped))
+	}
+
+	if mapped[0][0] != 5 {
+		t.Errorf("Expected 5, got %d", mapped[0][0])
+	}
+
+	if mapped[0][1] != 8 {
+		t.Errorf("Expected 8, got %d", mapped[0][1])
 	}
 }

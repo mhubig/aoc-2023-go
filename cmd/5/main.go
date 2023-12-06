@@ -25,6 +25,34 @@ func (m *Mapper) MapNumber(number int) int {
 	return number
 }
 
+// MapRange maps a range of numbers to a new range of numbers.
+// ===========================================================
+//
+// Seed: (1,3)
+//        src  =>  dst
+// Map1: (1,4) => (2,5)
+//
+// Seed (1,3) is in range of Map1 => mapped to list of ranges [(2,4)]
+// -----------------------------------------------------------
+// Seed: (3,5)
+//        src  =>  dst
+// Map1: (1,4) => (2,5)
+// Map2: (5,8) => (0,3)
+//
+// Seed (3,5) is in range of Map1 and Map2 => mapped to list of ranges [(4,5) (0)]
+
+func (m *Mapper) MapRange(start, end int) (mapped [][]int) {
+	for i := 0; i < len(m.SrcRanges); i++ {
+		if start >= m.SrcRanges[i][0] && end <= m.SrcRanges[i][1] {
+			mapped = append(mapped, []int{m.DstRanges[i][0] + (start - m.SrcRanges[i][0]), m.DstRanges[i][0] + (end - m.SrcRanges[i][0])})
+		} else {
+			mapped = append(mapped, []int{start, end})
+		}
+	}
+
+	return mapped
+}
+
 func createMapper(name string, mappingRules [][]int) Mapper {
 	m := Mapper{
 		Name:      name,
