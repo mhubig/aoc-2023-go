@@ -1,15 +1,16 @@
-# My take on the advent of code challenge 2023 in golang
+# 🎄 Advent of Code 2023 🎄
 
-See [advent of code](https://adventofcode.com/2023) for more information.
+My take on the advent of code challenge 2023 in golang. See
+[advent of code](https://adventofcode.com/2023) for more information.
 
-## Run the code
+## Build & run the code
 
 ```bash
-go run cmd/1/main.go
+make && ./bin/1
 ```
 
 ## Run the Tests
 
 ```bash
-go test -v cmd/1
+make test
 ```
