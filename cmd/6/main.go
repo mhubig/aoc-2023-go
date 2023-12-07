@@ -11,7 +11,7 @@ type Race struct {
 	Distance int
 }
 
-func parseRaces(data string) (races []*Race) {
+func parseRacesP1(data string) (races []*Race) {
 	numbers := strings.Fields(data)
 	length := len(numbers)
 
@@ -36,6 +36,34 @@ func parseRaces(data string) (races []*Race) {
 	return races
 }
 
+func parseRacesP2(data string) (races *Race) {
+	fields := strings.Fields(data)
+	length := len(fields)
+
+	time := ""
+	distance := ""
+
+	for i := 1; i < length/2; i++ {
+		time = time + fields[i]
+		distance = distance + fields[i+length/2]
+	}
+
+	race := &Race{}
+	var err error
+
+	race.Time, err = strconv.Atoi(time)
+	if err != nil {
+		panic(err)
+	}
+
+	race.Distance, err = strconv.Atoi(distance)
+	if err != nil {
+		panic(err)
+	}
+
+	return race
+}
+
 func calculateWinningStrategies(r *Race) (strategies int) {
 	for i := 1; i <= r.Time; i++ {
 		if (r.Time-i)*i > r.Distance {
@@ -50,12 +78,15 @@ func calculateWinningStrategies(r *Race) (strategies int) {
 var data string
 
 func main() {
-	races := parseRaces(data)
+	races := parseRacesP1(data)
 	productOfStrategies := 1
 
 	for _, race := range races {
 		productOfStrategies = productOfStrategies * calculateWinningStrategies(race)
 	}
 
-	println(productOfStrategies)
+	println("Part 1:", productOfStrategies)
+
+	race := parseRacesP2(data)
+	println("Part 2:", calculateWinningStrategies(race))
 }
