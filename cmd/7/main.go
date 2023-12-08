@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var mapping = map[string]int{
@@ -119,6 +120,8 @@ func readCards(data string) *CamelHands {
 var data string
 
 func main() {
+	tik := time.Now()
+
 	cards := readCards(data)
 	sort.Sort(cards)
 
@@ -128,6 +131,7 @@ func main() {
 		fmt.Printf("%s (%d) %3d => %9d\n", cards.Hands[i].Cards, cards.Hands[i].Rank, cards.Hands[i].Bid, totalWinnings)
 	}
 
+	elapsed := time.Since(tik).Seconds()
 	fmt.Println("==========================")
-	fmt.Printf("Total Winning:   %9d\n", totalWinnings)
+	fmt.Printf("Total Winning:   %9d (took %fs) \n", totalWinnings, elapsed)
 }
