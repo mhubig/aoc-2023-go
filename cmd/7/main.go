@@ -10,8 +10,8 @@ import (
 )
 
 var mapping = map[string]int{
-	"2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
-	"9": 9, "T": 10, "J": 11, "Q": 12, "K": 13, "A": 14,
+	"J": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7,
+	"8": 8, "9": 9, "T": 10, "Q": 11, "K": 12, "A": 13,
 }
 
 type Hand struct {
@@ -52,26 +52,27 @@ func setRank(hand *Hand) {
 		duplicates[card]++
 	}
 
-	// 1,1,1,1,1 => 1, High card
-	// 2,1,1,1   => 2, One pair
-	// 2,2,1     => 3, Two pair
-	// 3,1,1     => 4, Three of a kind
-	// 3,2       => 5, Full house
-	// 4,1       => 6, Four of a kind
+	// 1,1,1,1,1 => 1, High card        1xJ => 2
+	// 2,1,1,1   => 2, One pair         1xJ => 4, 2xJ => 4
+	// 2,2,1     => 3, Two pair         1xJ => 5, 2xJ => 6
+	// 3,1,1     => 4, Three of a kind  1xJ => 6, 3xJ => 6
+	// 3,2       => 5, Full house       2xJ => 7, 3xJ => 7
+	// 4,1       => 6, Four of a kind   1xJ => 7, 4xJ => 7
 	// 5         => 7, Five of a kind
 
+	var rank int
 	switch len(duplicates) {
 	case 1:
-		hand.Rank = 7
+		rank = 7
 	case 2:
 	OuterLoop2:
 		for _, v := range duplicates {
 			switch v {
 			case 4, 1:
-				hand.Rank = 6
+				rank = 6
 				break OuterLoop2
 			case 3, 2:
-				hand.Rank = 5
+				rank = 5
 				break OuterLoop2
 			}
 		}
@@ -80,18 +81,41 @@ func setRank(hand *Hand) {
 		for _, v := range duplicates {
 			switch v {
 			case 2:
-				hand.Rank = 3
+				rank = 3
 				break OuterLoop3
 			case 3:
-				hand.Rank = 4
+				rank = 4
 				break OuterLoop3
 			}
 		}
 	case 4:
-		hand.Rank = 2
+		rank = 2
 	case 5:
-		hand.Rank = 1
+		rank = 1
 	}
+
+	if amount, joker := duplicates["J"]; joker {
+		switch rank {
+		case 1:
+			rank = 2
+		case 2:
+			rank = 4
+		case 3:
+			if amount == 1 {
+				rank = 5
+			} else {
+				rank = 6
+			}
+		case 4:
+			rank = 6
+		case 5:
+			rank = 7
+		case 6:
+			rank = 7
+		}
+	}
+
+	hand.Rank = rank
 }
 
 func readCards(data string) *CamelHands {
