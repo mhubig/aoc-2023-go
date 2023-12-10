@@ -157,5 +157,5 @@ func main() {
 
 	elapsed := time.Since(tik).Seconds()
 	fmt.Println("==========================")
-	fmt.Printf("Total Winning:   %9d (took %fs) \n", totalWinnings, elapsed)
+	fmt.Printf("Total Winning:   %9d (took %fs)\n", totalWinnings, elapsed)
 }
