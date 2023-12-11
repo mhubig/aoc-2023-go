@@ -132,3 +132,22 @@ func TestParseNodes_GivenStringWithTreeNodes_ReturnThreeNodes(t *testing.T) {
 		t.Errorf("parseNodes() = %v, want %v", len(nodesActual), len(nodesExpected))
 	}
 }
+
+func TestParseDirections_GivenString_ReturnSliceOfStrings(t *testing.T) {
+	directionsGiven := "RL"
+	directionsExpected := []string{"R", "L"}
+
+	directionsActual := parseDirections(directionsGiven)
+
+	if len(directionsActual) != len(directionsExpected) {
+		t.Errorf("parseDirections() = %v, want %v", len(directionsActual), len(directionsExpected))
+	}
+
+	if directionsActual[0] != directionsExpected[0] {
+		t.Errorf("parseDirections() = %v, want %v", directionsActual[0], directionsExpected[0])
+	}
+
+	if directionsActual[1] != directionsExpected[1] {
+		t.Errorf("parseDirections() = %v, want %v", directionsActual[1], directionsExpected[1])
+	}
+}
