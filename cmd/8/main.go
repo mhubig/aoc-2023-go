@@ -44,7 +44,24 @@ func walkTheNodes(nodes map[string]*Node, directions []string) int {
 	return pos + 1
 }
 
-func walkNodesInParalell(nodes map[string]*Node, directions []string) []int {
+func gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+
+	return a
+}
+
+func lcm(n []int) int {
+	result := n[0]
+	for _, b := range n[1:] {
+		result = result * b / gcd(result, b)
+	}
+
+	return result
+}
+
+func walkNodesInParalell(nodes map[string]*Node, directions []string) int {
 	var steps []int
 
 	for _, node := range nodes {
@@ -62,28 +79,7 @@ func walkNodesInParalell(nodes map[string]*Node, directions []string) []int {
 		}
 	}
 
-	return steps
-}
-
-func gcd(a, b int) int {
-	for b != 0 {
-		a, b = b, a%b
-	}
-
-	return a
-}
-
-func lcm(a, b int) int {
-	return a * b / gcd(a, b)
-}
-
-func lcmAll(n []int) int {
-	result := n[0]
-	for _, b := range n[1:] {
-		result = lcm(result, b)
-	}
-
-	return result
+	return lcm(steps)
 }
 
 func parseDirections(data string) (directions []string) {
@@ -129,6 +125,6 @@ func main() {
 
 	// Part 2
 	tik = time.Now()
-	result = lcmAll(walkNodesInParalell(nodes, directions))
+	result = walkNodesInParalell(nodes, directions)
 	fmt.Printf("Part 2: Total steps %d (took %1.3fs)\n", result, time.Since(tik).Seconds())
 }
