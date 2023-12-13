@@ -3,8 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"net/http"
-	_ "net/http/pprof"
 	"strconv"
 	"strings"
 )
@@ -113,11 +111,6 @@ func getSeeds(input string) (seeds [][]int) {
 var data string
 
 func main() {
-
-	go func() {
-		http.ListenAndServe(":8080", nil)
-	}()
-
 	mappingRules := strings.Split(data, "\n\n")
 	seedRanges := getSeeds(mappingRules[0])
 
